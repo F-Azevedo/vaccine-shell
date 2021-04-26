@@ -26,6 +26,7 @@
 #define ITALICS   "\033[3;"
 #define UNDERLINE "\033[4;"
 #define SPOTLIGHT "\033[5;"
+#define FILL      "\033[7;"
 
 /* Use Tutorial
  * String = <type_of_text> <color> ... RESET
