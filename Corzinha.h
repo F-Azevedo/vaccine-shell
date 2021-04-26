@@ -25,6 +25,7 @@
 #define FAINT     "\033[2;"
 #define ITALICS   "\033[3;"
 #define UNDERLINE "\033[4;"
+#define SPOTLIGHT "\033[5;"
 
 /* Use Tutorial
  * String = <type_of_text> <color> ... RESET

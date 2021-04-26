@@ -19,6 +19,29 @@ typedef struct COMANDO{
     int nargs;
 }tCommand;
 
+char * removePath(char * path){
+
+    int i;
+    for (i = strlen(path)-1; path[i] != '/'; i--);
+    char * new = malloc(sizeof(char) * (strlen(path)-i));
+    for (int j=i+1; j <= strlen(path); j++){
+        new[j-(i+1)] = path[j];
+    }
+    return new;
+}
+
+void printLineCommand(){
+
+    char cwd[PATH_MAX], user[NAME_MAX];
+    getcwd(cwd, sizeof(cwd));
+    char* func = removePath(cwd);
+    printf(BOLD MAGENTA "afv:vsh "
+           BOLD VERDE "%s "
+           BOLD AZUL "%s > " RESET, getlogin(), func);
+    free(func);
+
+}
+
 void preencheArgumentos(tCommand* cmd, int background){
 
     char* save;
@@ -66,11 +89,13 @@ int readLine(){
     int qtdCmds = 0;
     int background = 0;
 
-    char command_line[LINE_MAX], * save;
+    char* command_line, * save;
+    size_t bufsize = LINE_MAX;
+    command_line = (char*) malloc(bufsize * sizeof(char));
+    getline(&command_line, &bufsize, stdin);
+    command_line[strlen(command_line)-1] = 0;
 
-    if (scanf("%[^\n]%*c", command_line) != 1) return 0;
-
-//    printf("\"%s\"\n", command_line);
+    printf("\"%s\"\n", command_line);
     if(command_line[strlen(command_line)- 1] == '&'){
         strncpy(command_line, command_line, strlen(command_line)-1);
         //cria filho
@@ -81,9 +106,11 @@ int readLine(){
 //    printf("\"%s\"\n", command_line);
 
     cmd[qtdCmds].fullCommand = strtok_r(command_line, "|", &save);
-
+    printf("FULL COMMAND: '%s'\n", cmd[qtdCmds].fullCommand);
     while (cmd[qtdCmds].fullCommand){
         if(strcmp(cmd[qtdCmds].fullCommand, "armageddon") == 0){
+            printf("SIM\n");
+            free(command_line);
             return(0);
         }
         preencheArgumentos(&cmd[qtdCmds], background);
@@ -99,6 +126,7 @@ int readLine(){
         if(pipe(fd[j]) < 0){
             printf("Erro ao abrir pipe\n");
             printf("I dont fell to good\n");
+            free(command_line);
             return 1;
         }
     }
@@ -106,7 +134,10 @@ int readLine(){
     if(qtdPipes == 0){
         int pid = fork();
         if(pid == 0){
-            execvp(cmd[0].command, cmd[0].args);
+            if(execvp(cmd[0].command, cmd[0].args) == -1){
+                printf("Da um comando válido filha da puta\n");
+                exit(0);
+            }
         }
         else{
             waitpid(pid, NULL, 0);
@@ -131,7 +162,10 @@ int readLine(){
                     close(fd[k][1]);
                 }
 
-                execvp(cmd[j].command, cmd[j].args);
+                if(execvp(cmd[j].command, cmd[j].args) == -1){
+                    printf("Da um comando válido filha da puta\n");
+                    exit(0);
+                }
             } else {
                 if(j < qtdPipes)
                     close(fd[j][1]);
@@ -143,40 +177,19 @@ int readLine(){
         }
     }
 
-    for(int j =0; j<qtdCmds; j++){
+    for(int j =0; j<qtdCmds; j++) {
         freeComand(&cmd[j]);
     }
 
+    free(command_line);
     return 1;
-
-}
-
-char * removePath(char * path){
-
-    int i;
-    for (i = strlen(path)-1; path[i] != '/'; i--);
-    char * new = malloc(sizeof(char) * (strlen(path)-i));
-    for (int j=i+1; j <= strlen(path); j++){
-        new[j-(i+1)] = path[j];
-    }
-    return new;
-}
-
-void printLineCommand(){
-
-    char cwd[PATH_MAX], user[NAME_MAX];
-    getcwd(cwd, sizeof(cwd));
-    char* func = removePath(cwd);
-    printf(BOLD MAGENTA "afv:vsh "
-           BOLD VERDE "%s "
-           BOLD AZUL "%s > " RESET, getlogin(), func);
-    free(func);
 
 }
 
 void run_shell() {
 
-    do {
+//    readLine();
+    do{
         printLineCommand();
     } while (readLine());
 
