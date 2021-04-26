@@ -45,6 +45,8 @@ void zeca(int sig){
            "            "V("`''---''``")"       "V("`.'                                 \n")
            "\033[5;" VERMELHO "To doidão.\033[0m\n" RESET
            "   |->" BOLD VERDE " by zé jacaré\n" RESET);
+    printLineCommand();
+    fflush(stdout);
     sigprocmask(SIG_UNBLOCK, &sigset, NULL);
 
 }

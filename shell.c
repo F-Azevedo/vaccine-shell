@@ -42,7 +42,7 @@ void printLineCommand(){
 
 }
 
-void preencheArgumentos(tCommand* cmd, int background){
+void preencheArgumentos(tCommand* cmd){
 
     char* save;
 
@@ -87,7 +87,6 @@ int readLine(){
 
     tCommand cmd[5];
     int qtdCmds = 0;
-    int background = 0;
 
     char* command_line, * save;
     size_t bufsize = LINE_MAX;
@@ -96,42 +95,123 @@ int readLine(){
     command_line[strlen(command_line)-1] = 0;
 
     printf("\"%s\"\n", command_line);
-    if(command_line[strlen(command_line)- 1] == '&'){
-        strncpy(command_line, command_line, strlen(command_line)-1);
-        //cria filho
-        //muda session do filho
 
-        background = 1;
-    }
-//    printf("\"%s\"\n", command_line);
-
-    cmd[qtdCmds].fullCommand = strtok_r(command_line, "|", &save);
-    printf("FULL COMMAND: '%s'\n", cmd[qtdCmds].fullCommand);
-    while (cmd[qtdCmds].fullCommand){
-        if(strcmp(cmd[qtdCmds].fullCommand, "armageddon") == 0){
-            printf("SIM\n");
-            free(command_line);
-            return(0);
+    int temPipe = 0;
+    for(int i=0; command_line[i] != 0; i++)
+        if(command_line[i] == '|'){
+            temPipe = 1;
+            break;
         }
-        preencheArgumentos(&cmd[qtdCmds], background);
-        qtdCmds++;
-        cmd[qtdCmds].fullCommand = strtok_r(NULL, "|", &save);
-    }
+    printf("TEM PIPE = %d\n", temPipe);
+    //    printf("\"%s\"\n", command_line);
 
-    int qtdPipes = qtdCmds-1;
+    if(temPipe){
+        int VSH[2];
+        pipe(VSH);
+        int BACKGROUND = fork();
 
-    int fd[qtdPipes][2];
+        if(BACKGROUND == 0){
+            int res = setsid();
 
-    for(int j = 0; j<qtdPipes; j++){
-        if(pipe(fd[j]) < 0){
-            printf("Erro ao abrir pipe\n");
-            printf("I dont fell to good\n");
-            free(command_line);
-            return 1;
+            write(VSH[1], &res, sizeof(int));
+
+            if(res != -1){
+                printf("VOU CRIAR PIPES\n");
+
+                cmd[qtdCmds].fullCommand = strtok_r(command_line, "|", &save);
+                printf("FULL COMMAND: '%s'\n", cmd[qtdCmds].fullCommand);
+                while (cmd[qtdCmds].fullCommand){
+                    if(strcmp(cmd[qtdCmds].fullCommand, "armageddon") == 0){
+                        printf("SIM\n");
+                        free(command_line);
+                        return(0);
+                    }
+                    preencheArgumentos(&cmd[qtdCmds]);
+                    qtdCmds++;
+                    cmd[qtdCmds].fullCommand = strtok_r(NULL, "|", &save);
+                }
+
+                int qtdPipes = qtdCmds-1;
+
+                int fd[qtdPipes][2];
+
+                for(int j = 0; j<qtdPipes; j++){
+                    if(pipe(fd[j]) < 0){
+                        printf("Erro ao abrir pipe\n");
+                        printf("I dont fell to good\n");
+                        free(command_line);
+                        return 1;
+                    }
+                }
+
+                for (int j = 0; j < qtdCmds; j++) {
+                    int pid = fork();
+                    if (pid == 0) {
+
+                        if (j == 0) {
+                            dup2(fd[j][1], STDOUT_FILENO);
+                        } else if (j == qtdPipes) {
+                            dup2(fd[j - 1][0], STDIN_FILENO);
+                        } else {
+                            dup2(fd[j - 1][0], STDIN_FILENO);
+                            dup2(fd[j][1], STDOUT_FILENO);
+                        }
+
+                        for (int k = 0; k < qtdPipes; k++) {
+                            close(fd[k][0]);
+                            close(fd[k][1]);
+                        }
+
+                        if(execvp(cmd[j].command, cmd[j].args) == -1){
+                            printf("Da um comando válido filha da puta\n");
+                            exit(0);
+                        }
+                    } else {
+                        if(j < qtdPipes)
+                            close(fd[j][1]);
+                        waitpid(pid, NULL, 0);
+                    }
+                }
+                for (int k = 0; k < qtdPipes; k++) {
+                    close(fd[k][0]);
+                }
+
+                for(int j =0; j<qtdCmds; j++) {
+                    freeComand(&cmd[j]);
+                }
+
+            }
+            //Termina o filho.
+            exit(0);
         }
-    }
+        else{
+            int filhoTrocouSessao;
+            read(VSH[0], &filhoTrocouSessao, sizeof(int));
+            if(filhoTrocouSessao != -1){
+                printf("Vou adicoinar na lista\n");
+                //adiciona na lista
+            }
+            else{
+                printf("Deu erro no meu filho trocar sessão\n");
+            }
+        };
 
-    if(qtdPipes == 0){
+    }
+    else{
+        printf("NAO VOI CRIAR PIPES\n");
+        cmd[qtdCmds].fullCommand = strtok_r(command_line, "|", &save);
+        printf("FULL COMMAND: '%s'\n", cmd[qtdCmds].fullCommand);
+        while (cmd[qtdCmds].fullCommand){
+            if(strcmp(cmd[qtdCmds].fullCommand, "armageddon") == 0){
+                printf("SIM\n");
+                free(command_line);
+                return(0);
+            }
+            preencheArgumentos(&cmd[qtdCmds]);
+            qtdCmds++;
+            cmd[qtdCmds].fullCommand = strtok_r(NULL, "|", &save);
+        }
+
         int pid = fork();
         if(pid == 0){
             if(execvp(cmd[0].command, cmd[0].args) == -1){
@@ -143,43 +223,6 @@ int readLine(){
             waitpid(pid, NULL, 0);
         }
     }
-    else {
-        for (int j = 0; j < qtdCmds; j++) {
-            int pid = fork();
-            if (pid == 0) {
-
-                if (j == 0) {
-                    dup2(fd[j][1], STDOUT_FILENO);
-                } else if (j == qtdPipes) {
-                    dup2(fd[j - 1][0], STDIN_FILENO);
-                } else {
-                    dup2(fd[j - 1][0], STDIN_FILENO);
-                    dup2(fd[j][1], STDOUT_FILENO);
-                }
-
-                for (int k = 0; k < qtdPipes; k++) {
-                    close(fd[k][0]);
-                    close(fd[k][1]);
-                }
-
-                if(execvp(cmd[j].command, cmd[j].args) == -1){
-                    printf("Da um comando válido filha da puta\n");
-                    exit(0);
-                }
-            } else {
-                if(j < qtdPipes)
-                    close(fd[j][1]);
-                waitpid(pid, NULL, 0);
-            }
-        }
-        for (int k = 0; k < qtdPipes; k++) {
-            close(fd[k][0]);
-        }
-    }
-
-    for(int j =0; j<qtdCmds; j++) {
-        freeComand(&cmd[j]);
-    }
 
     free(command_line);
     return 1;
@@ -188,7 +231,6 @@ int readLine(){
 
 void run_shell() {
 
-//    readLine();
     do{
         printLineCommand();
     } while (readLine());
