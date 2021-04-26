@@ -5,7 +5,9 @@
 #ifndef T1_SO_SHELL_H
 #define T1_SO_SHELL_H
 
-void run_shell();
+#include "Lista.h"
+
+void run_shell(Lista *);
 void printLineCommand();
 
 #endif //T1_SO_SHELL_H

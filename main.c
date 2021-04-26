@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include "shell.h"
 #include "Corzinha.h"
+#include "Lista.h"
 
 #define V(c) FILL VERDE c RESET
 #define W(c) FILL CINZA_CLARO c RESET
@@ -66,8 +67,12 @@ int main() {
     sigaction(SIGUSR1, &act, NULL);
     sigaction(SIGUSR2, &act, NULL);
 
+
+    Lista* list = iniciaLista();
     //clearScreen();
-    run_shell();
+    run_shell(list);
+    imprimeLista(list);
+    liberaLista(list);
     return 0;
 }
 
