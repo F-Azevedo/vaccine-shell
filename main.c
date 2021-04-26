@@ -69,7 +69,7 @@ int main() {
 
 
     Lista* list = iniciaLista();
-    //clearScreen();
+    clearScreen();
     run_shell(list);
     imprimeLista(list);
     liberaLista(list);

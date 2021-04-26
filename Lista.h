@@ -12,5 +12,6 @@ void insereLista(Lista* list, int gid);
 void removeLista(Lista* list, int gid);
 void imprimeLista(Lista* list);
 void liberaLista(Lista * lis);
+void armageddon(Lista* list);
 
 #endif //T1_SO_LISTA_H

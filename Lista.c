@@ -6,6 +6,7 @@
 #include "Corzinha.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 typedef struct cel Cel;
 
@@ -18,6 +19,12 @@ struct lista{
     Cel* prim,
        * ult;
 };
+
+void armageddon(Lista* list){
+
+    for(Cel* aux = list->prim; aux; aux = aux->prox)
+        killpg(aux->gid, SIGKILL);
+}
 
 Lista* iniciaLista(){
     Lista* list = malloc(sizeof(Lista));
@@ -67,7 +74,7 @@ void imprimeLista(Lista* list){
 
     int cont=0;
     for(Cel * aux = list->prim; aux; aux=aux->prox)
-        printf("Gid[%2d]: %d\n", cont++, aux->gid);
+        printf("Gid[%d]: %d\n", cont++, aux->gid);
     printf("\n\n");
 }
 
