@@ -13,5 +13,6 @@ void removeLista(Lista* list, int gid);
 void imprimeLista(Lista* list);
 void liberaLista(Lista * lis);
 void armageddon(Lista* list);
+void liberaMoita(Lista* list);
 
 #endif //T1_SO_LISTA_H

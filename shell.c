@@ -20,6 +20,31 @@ typedef struct COMANDO{
     int nargs;
 }tCommand;
 
+void signalHandler(int sig){
+
+    kill(0, SIGKILL);
+
+}
+
+void ctrlC(int sig){
+    // Tem que ter acesso ao pid do filho.
+    //kill( pid, SIGINT);
+}
+
+//Função para atribuir à vsh enquanto ela espera o processo de foreground terminar.
+void atribuiSigactionForeground(struct sigaction* act){
+    act->sa_handler = ctrlC;
+    act->sa_flags = SA_RESTART;
+    sigaction(SIGUSR1, act, NULL);
+}
+
+void atribuiSigaction(struct sigaction* act){
+    act->sa_handler = signalHandler;
+    act->sa_flags = SA_RESTART;
+    sigaction(SIGUSR1, act, NULL);
+    sigaction(SIGUSR2, act, NULL);
+}
+
 char * removePath(char * path){
 
     int i;
@@ -91,16 +116,26 @@ void freeCommand(tCommand* cmd){
 
 void foreground(tCommand cmd[5]){
 
-    printf("FOREGROUND\n");
-
     int pid = fork();
     if(pid == 0){
+        sigset_t sigset;
+        sigemptyset(&sigset);
+        sigaddset(&sigset, SIGUSR1);
+        sigaddset(&sigset, SIGUSR2);
+        if(sigprocmask(SIG_BLOCK, &sigset, NULL))
+            perror("Erro na criação da sigprocmask\n");
         if(execvp(cmd[0].command, cmd[0].args) == -1){
             printf("Da um comando válido filhx da pute\n");
             exit(0);
         }
+        sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+
     }
-    else waitpid(pid, NULL, 0);
+    else{
+        //Inicia o controle do tratamento de sinal para o CTRL-C
+        waitpid(pid, NULL, 0);
+        //Termina o tratamento de sinal do CTRL-C
+    }
 
 }
 
@@ -115,10 +150,12 @@ void background(tCommand cmd[5], int qtdCmds, Lista* list){
     int BACKGROUND = fork();
 
     if(BACKGROUND == 0){
-        printf("BACKGROUND\n");
-        printf("RES ANTIGO: %d\n", getsid(getpid()));
+
+        struct sigaction act;
+
+        atribuiSigaction(&act);
+
         int newSession = setsid();
-        printf("NewSession = %d\n", newSession);
 
         if(newSession == -1){ perror("Erro na criação de uma nova sessão"); exit(1);}
 
@@ -128,12 +165,10 @@ void background(tCommand cmd[5], int qtdCmds, Lista* list){
         for(int j = 0; j<qtdPipes; j++)
             if(pipe(fd[j]) < 0){ printf("Erro ao abrir pipe\n"); exit(1); }
 
-        //printf(NORMAL AMARELO "Passei aqui\n" RESET);
         for (int j = 0; j < qtdCmds; j++) {
             int pid = fork();
             if (pid == 0) {
-                //printf(NORMAL VERMELHO "Passei aqui\n" RESET);
-                //printCommand(cmd[j]);
+
                 if (j == 0) {
                     dup2(fd[j][1], STDOUT_FILENO);
                 } else if (j == qtdPipes) {
@@ -148,34 +183,28 @@ void background(tCommand cmd[5], int qtdCmds, Lista* list){
                 liberaPipes(fd, 1, qtdPipes);
 
                 if(execvp(cmd[j].command, cmd[j].args) == -1) {
-                    printf("Da um comando válido filho da puta\n");
+                    printf("Da um comando válido filhx del pute\n");
                     exit(0);
                 }
             } else {
-                //printf(NORMAL MAGENTA "Passei aqui\n" RESET);
                 if(j < qtdPipes) close(fd[j][1]);
-                waitpid(pid, NULL, 0);
+                int status;
+                waitpid(pid, &status, 0);
+                if(status == 10 || status == 12) raise(SIGUSR1);
             }
         }
 
-        // Libera todos pipes de leitura
-        liberaPipes(fd, 0, qtdPipes);
-
+        liberaPipes(fd, 0, qtdPipes);  // Libera todos pipes de leitura
         for(int j =0; j<qtdCmds; j++) freeCommandArgs(&cmd[j]);
-
         //Termina o filho.
         exit(0);
     }
-    else{
-        //waitpid(BACKGROUND, NULL, 0);
-        insereLista(list, BACKGROUND);
-    }
+    else insereLista(list, BACKGROUND);
 
 }
 
 void defineGround(tCommand cmd[5], int qtdCmds, Lista* list){
 
-    //for (int i=0; i < qtdCmds; i++) printCommand(&cmd[i]);
     if(qtdCmds < 2) foreground(cmd);
     else background(cmd, qtdCmds, list);
 
@@ -192,23 +221,23 @@ int readLine(Lista* list){
     getline(&command_line, &bufsize, stdin);
     command_line[strlen(command_line)-1] = 0;
 
-    printf("\"%s\"\n", command_line);
-
     cmd[qtdCmds].fullCommand = strtok_r(command_line, "|", &save);
-    printf("FULL COMMAND: '%s'\n", cmd[qtdCmds].fullCommand);
+
     while (cmd[qtdCmds].fullCommand){
         if(strcmp(cmd[qtdCmds].fullCommand, "armageddon") == 0){
             armageddon(list);
-            printf("SIM\n");
             free(command_line);
-            return(0);
+            return 0;
+        }
+        else if(strcmp(cmd[qtdCmds].fullCommand, "liberamoita") == 0){
+            liberaMoita(list);
+            free(command_line);
+            return 1;
         }
         preencheArgumentos(&cmd[qtdCmds]);
         qtdCmds++;
         cmd[qtdCmds].fullCommand = strtok_r(NULL, "|", &save);
     }
-
-
 
     defineGround(cmd, qtdCmds, list);
 
@@ -222,8 +251,7 @@ int readLine(Lista* list){
 
 void run_shell(Lista* list) {
 
-    do{
-        printLineCommand();
-    } while (readLine(list));
+    do printLineCommand();
+    while (readLine(list));
 
 }

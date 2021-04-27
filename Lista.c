@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 typedef struct cel Cel;
 
@@ -20,10 +21,18 @@ struct lista{
        * ult;
 };
 
+void liberaMoita(Lista* list){
+
+    for(Cel* aux = list->prim; aux; aux = aux->prox)
+        waitpid(aux->gid, NULL, WNOHANG);
+
+}
+
 void armageddon(Lista* list){
 
     for(Cel* aux = list->prim; aux; aux = aux->prox)
         killpg(aux->gid, SIGKILL);
+
 }
 
 Lista* iniciaLista(){
@@ -43,26 +52,6 @@ void insereLista(Lista* list, int gid){
         list->ult->prox = cel;
         list->ult = cel;
     }
-
-}
-
-void removeLista(Lista* list, int gid){
-    Cel * ant,
-        * aux;
-    for(aux = list->prim; aux != NULL; aux = aux->prox){
-        if(aux->gid == gid){
-            break;
-        }
-        ant = aux;
-    }
-
-    if(list->prim == aux && list->ult == aux) list->prim = list->ult = NULL;
-    else if(list->prim == aux)  list->prim = aux->prox;
-    else if(list->ult == aux){
-        ant->prox = NULL;
-        list->ult = ant;
-    }
-    else    ant->prox = aux->prox;
 
 }
 
@@ -87,6 +76,6 @@ void liberaLista(Lista * lis){
         free(aux);
         aux = prox;
     }
-
-    //for (Cel * aux=lis->prim, * prox=aux->prox; aux; aux=prox, aux=aux->prox) free(aux);
+    free(lis);
 }
+
