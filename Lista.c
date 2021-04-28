@@ -7,12 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <unistd.h>
 #include <sys/wait.h>
 
 typedef struct cel Cel;
 
 struct cel{
-    int gid;
+    int pid;
     Cel * prox;
 };
 
@@ -24,14 +25,19 @@ struct lista{
 void liberaMoita(Lista* list){
 
     for(Cel* aux = list->prim; aux; aux = aux->prox)
-        waitpid(aux->gid, NULL, WNOHANG);
+        waitpid(aux->pid, NULL, WNOHANG);
 
 }
 
-void armageddon(Lista* list){
+void armageddon(Lista* list, int pid){
 
-    for(Cel* aux = list->prim; aux; aux = aux->prox)
-        killpg(aux->gid, SIGKILL);
+    for(Cel* aux = list->prim; aux; aux = aux->prox){
+        if(aux->pid != getpgid(aux->pid)) {
+            kill(aux->pid, SIGKILL);
+        } else if(pid != aux->pid){
+            killpg(aux->pid, SIGKILL);
+        }
+    }
 
 }
 
@@ -41,9 +47,9 @@ Lista* iniciaLista(){
     return list;
 }
 
-void insereLista(Lista* list, int gid){
+void insereLista(Lista* list, int pid){
     Cel* cel = malloc(sizeof(Cel));
-    cel->gid = gid;
+    cel->pid = pid;
     cel->prox = NULL;
 
     if (!list->prim)
@@ -63,7 +69,7 @@ void imprimeLista(Lista* list){
 
     int cont=0;
     for(Cel * aux = list->prim; aux; aux=aux->prox)
-        printf("Gid[%d]: %d\n", cont++, aux->gid);
+        printf("Gid[%d]: %d\n", cont++, aux->pid);
     printf("\n\n");
 }
 

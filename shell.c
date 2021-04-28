@@ -6,12 +6,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <limits.h>
+
+#include "sinais.h"
+#include "shell.h"
 #include "Corzinha.h"
 #include "Lista.h"
-#include <limits.h>
-#include <sys/wait.h>
 
 #define ARG_MAX 3
+
+extern void zeca(int sig);
 
 typedef struct COMANDO{
     char* fullCommand;
@@ -20,45 +25,21 @@ typedef struct COMANDO{
     int nargs;
 }tCommand;
 
-void signalHandler(int sig){
-
-    kill(0, SIGKILL);
-
-}
-
-void ctrlC(int sig){
-    // Tem que ter acesso ao pid do filho.
-    //kill( pid, SIGINT);
-}
-
-//Função para atribuir à vsh enquanto ela espera o processo de foreground terminar.
-void atribuiSigactionForeground(struct sigaction* act){
-    act->sa_handler = ctrlC;
-    act->sa_flags = SA_RESTART;
-    sigaction(SIGUSR1, act, NULL);
-}
-
-void atribuiSigaction(struct sigaction* act){
-    act->sa_handler = signalHandler;
-    act->sa_flags = SA_RESTART;
-    sigaction(SIGUSR1, act, NULL);
-    sigaction(SIGUSR2, act, NULL);
-}
-
 char * removePath(char * path){
 
     int i;
-    for (i = strlen(path)-1; path[i] != '/'; i--);
+    for (i = (int)strlen(path)-1; path[i] != '/'; i--);
     char * new = malloc(sizeof(char) * (strlen(path)-i));
     for (int j=i+1; j <= strlen(path); j++){
         new[j-(i+1)] = path[j];
     }
     return new;
+
 }
 
 void printLineCommand(){
 
-    char cwd[PATH_MAX], user[NAME_MAX];
+    char cwd[PATH_MAX];
     getcwd(cwd, sizeof(cwd));
     char* func = removePath(cwd);
     printf(BOLD MAGENTA "afv:vsh "
@@ -95,7 +76,6 @@ void preencheArgumentos(tCommand* cmd){
 }
 
 void printCommand(tCommand* cmd){
-
     printf(NORMAL MAGENTA "Comando inteiro:\n" RESET "%s\n", cmd->fullCommand);
     printf(NORMAL AZUL "Nome do comando:" RESET " %s\n", cmd->command);
     printf(NORMAL AMARELO "Argumentos:\n" RESET);
@@ -109,12 +89,7 @@ void freeCommandArgs(tCommand* cmd) {
     free(cmd->args);
 }
 
-void freeCommand(tCommand* cmd){
-    freeCommandArgs(cmd);
-    free(cmd);
-}
-
-void foreground(tCommand cmd[5]){
+void foreground(tCommand cmd[5], Lista* list, struct sigaction* act){
 
     int pid = fork();
     if(pid == 0){
@@ -132,9 +107,20 @@ void foreground(tCommand cmd[5]){
 
     }
     else{
-        //Inicia o controle do tratamento de sinal para o CTRL-C
-        waitpid(pid, NULL, 0);
-        //Termina o tratamento de sinal do CTRL-C
+
+        setSigactionForeground(act, pid);
+
+        int status;
+        waitpid(pid, &status, WUNTRACED);
+        printf("STATUS: %d", status);
+        if (WIFSTOPPED(status)){
+            insereLista(list, pid);
+            printf("[PARENT]: Vou adicionar o filho que tomou stop na lista.\n");
+        }
+
+        resetSigaction(act);
+        setSigactionMain(act);
+
     }
 
 }
@@ -153,7 +139,7 @@ void background(tCommand cmd[5], int qtdCmds, Lista* list){
 
         struct sigaction act;
 
-        atribuiSigaction(&act);
+        setSigactionSIGUSR(&act);
 
         int newSession = setsid();
 
@@ -203,14 +189,14 @@ void background(tCommand cmd[5], int qtdCmds, Lista* list){
 
 }
 
-void defineGround(tCommand cmd[5], int qtdCmds, Lista* list){
+void defineGround(tCommand cmd[5], int qtdCmds, Lista* list, struct sigaction* act){
 
-    if(qtdCmds < 2) foreground(cmd);
+    if(qtdCmds < 2) foreground(cmd, list, act);
     else background(cmd, qtdCmds, list);
 
 }
 
-int readLine(Lista* list){
+int readLine(Lista* list, struct sigaction* act){
 
     tCommand cmd[5];
     int qtdCmds = 0;
@@ -225,7 +211,7 @@ int readLine(Lista* list){
 
     while (cmd[qtdCmds].fullCommand){
         if(strcmp(cmd[qtdCmds].fullCommand, "armageddon") == 0){
-            armageddon(list);
+            armageddon(list, getpid());
             free(command_line);
             return 0;
         }
@@ -239,7 +225,7 @@ int readLine(Lista* list){
         cmd[qtdCmds].fullCommand = strtok_r(NULL, "|", &save);
     }
 
-    defineGround(cmd, qtdCmds, list);
+    defineGround(cmd, qtdCmds, list, act);
 
     free(command_line);
     for(int j =0; j<qtdCmds; j++) {
@@ -249,9 +235,9 @@ int readLine(Lista* list){
 
 }
 
-void run_shell(Lista* list) {
+void run_shell(Lista* list, struct sigaction* act) {
 
     do printLineCommand();
-    while (readLine(list));
+    while (readLine(list, act));
 
 }
