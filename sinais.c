@@ -1,25 +1,16 @@
 //
 // Created by fernando on 28/04/2021.
 //
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
 
+#include "desenhos.h"
 #include "sinais.h"
 #include "shell.h"
 #include "Corzinha.h"
-
-#define V(c) FILL VERDE c RESET
-#define W(c) FILL CINZA_CLARO c RESET
-#define A(c) FILL AZUL c RESET
-#define Y(c) FILL AMARELO c RESET
-#define P(c) FILL PRETO c RESET
-#define R(c) FILL VERMELHO c RESET
-#define T(c) SPOTLIGHT "7;" CIANO c RESET
-#define S(c) SPOTLIGHT VERMELHO c RESET
 
 int SON_PID = 0;
 
@@ -78,32 +69,7 @@ void zeca(int sig){
     // Funcionou
     sleep(10);
 
-    printf("\n"
-           "                    " V(".--.  .--.")"\n"
-                                                 "                   "V("/    \\/    \\")"\n"
-                                                                                         "                   "V("| ") W(".-.") V("  ") W(".-.") V("  \\\n")
-    "                   "V("|")W("/_  |/_  |")V("   \\\n")
-    "                   "V("|")W("| `\\|| `\\")W("|")V("    `----.\n")
-    "                   "V("|")W("\\")T("0 ")W("/")V(" ")W("\\")T("0 ")W("/")V("    --,    \\_\n")
-    " "V(".--\"\"\"\"\"-.")"       "V("/              (` \\     `-.\n")
-    ""V("/          \\-----'-.              ")V("\\")V("          \\\n")
-    ""V("\\  ") P("  ")V(" ")P("  ")V("                         ")V("/`\\")V("         \\\n")
-    ""V("|                         .___")V(".-'   |")V("          \\\n")
-    ""V("\\                        ")V("/` ")W("\\|")V("      ")V("/           ;\n")
-    " "V("`-.___             ___.' ")R(".-.")W("`")R(".---.")V("|             \\\n")
-    "    "W("\\|")" "V("``-..___,.-'`")W("\\|")V(" / ")R("/   /     |")V("              `\\\n")
-    "     "W("`")"      "W("\\|")"      "W(",`")V("/ ")R("/   /   ")W(",")R("  /")V("                  \n")
-    "             "W("`")"      "W("|\\")V(" ")R("/   /    ")W("|\\")V("/                      \n")
-    "              "W(",")"   "V(".'`-")R(";   '     ")W("\\/")V("                         \n")
-    "         "W(",")"    "W("|\\")V("-'  ")R(".'   ")W(",")R("   .-'`")V("                           \n")
-    "       "V(".-")W("|\\")V("--")W(";")V("`` ")R(".-'     ")W("|\\")R(".'")V("                                \n")
-    "      "V("( `")W("\"'")V("-.")W("|\\")V(" ")R("(___,.--'")V("`'                                   \n")
-    "       "V("`-.    `\"`          _.--'                               \n")
-    "          "V("`.          _.-'`-.'                                  \n")
-    "            "V("`''---''``")"       "V("`.'                                 \n")
-    S("To doidão.\n")
-    S("Vodu é pra jacu\n")
-    "   |->" BOLD VERDE " by zé jacaré\n" RESET);
+    printZeca();
     printLineCommand();
     fflush(stdout);
 

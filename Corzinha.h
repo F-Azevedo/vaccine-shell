@@ -28,11 +28,6 @@
 #define SPOTLIGHT "\033[5;"
 #define FILL      "\033[7;"
 
-#define V(c) FILL VERDE c RESET
-#define W(c) FILL CINZA_CLARO c RESET
-#define P(c) FILL PRETO c RESET
-#define R(c) FILL VERMELHO c RESET
-
 /* Use Tutorial
  * String = <type_of_text> <color> ... RESET
  * printf( NORMAL RED ... RESET);

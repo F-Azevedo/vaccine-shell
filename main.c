@@ -1,23 +1,20 @@
 #include <signal.h>
-
 #include "shell.h"
 #include "Lista.h"
-#include "animacao.h"
+#include "desenhos.h"
 
 int main() {
 
     struct sigaction act;
     setSigactionMain(&act);
 
-    clearScreen();
+    entryScreen();  // Imprime tela de entrada
 
-    //print();
     Lista* list = iniciaLista();
     run_shell(list, &act);
 
     liberaMoita(list);
-//    imprimeLista(list);
-    liberaLista(list);
+    liberaLista(list);  // Libera a estrutura da lista
     return 0;
 
 }

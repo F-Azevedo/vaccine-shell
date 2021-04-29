@@ -112,7 +112,6 @@ void foreground(tCommand cmd[5], Lista* list, struct sigaction* act){
 
         int status;
         waitpid(pid, &status, WUNTRACED);
-        printf("STATUS: %d", status);
         if (WIFSTOPPED(status)){
             insereLista(list, pid);
             printf("[PARENT]: Vou adicionar o filho que tomou stop na lista.\n");
