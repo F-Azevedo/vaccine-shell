@@ -80,17 +80,6 @@ void freeCommandArgs(tCommand* cmd) {
     free(cmd->args);
 }
 
-// Função de testes para imprimir o comando.
-void printCommand(tCommand* cmd){
-    printf(NORMAL MAGENTA "Comando inteiro:\n" RESET "%s\n", cmd->fullCommand);
-    printf(NORMAL AZUL "Nome do comando:" RESET " %s\n", cmd->command);
-    printf(NORMAL AMARELO "Argumentos:\n" RESET);
-    for (int i=0; i < cmd->nargs+2; i++){
-        printf("Arg[%d]: %s\n", i, cmd->args[i]);
-    }
-    printf("\n\n");
-}
-
 // Função para executar um comando que for passado como foreground.
 void foreground(tCommand cmd[5], Lista* list, struct sigaction* act){
     int pid = fork();
@@ -117,7 +106,6 @@ void foreground(tCommand cmd[5], Lista* list, struct sigaction* act){
         // Se o filho foi suspenso, adiciona o filho na lista.
         if (WIFSTOPPED(status)){
             insereLista(list, pid);
-            printf("[PARENT]: Vou adicionar o filho que tomou stop na lista.\n");
         }
 
         // Reseta o Sigaction da VSH.

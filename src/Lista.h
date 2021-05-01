@@ -10,7 +10,6 @@ typedef struct lista Lista;
 Lista* iniciaLista();
 void liberaMoita(Lista* list);
 void liberaLista(Lista* list);
-void imprimeLista(Lista* list);
 void armageddon(Lista* list, int pid);
 void insereLista(Lista* list, int gid);
 

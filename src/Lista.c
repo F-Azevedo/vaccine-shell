@@ -76,17 +76,6 @@ void insereLista(Lista* list, int pid){
     }
 }
 
-void imprimeLista(Lista* list){
-    printf(NORMAL VERDE "Lista:\n" RESET);
-
-    if (!list->prim){ printf("Lista Vazia.\n\n"); return; }
-
-    int cont=0;
-    for(Cel * aux = list->prim; aux; aux=aux->prox)
-        printf("Gid[%d]: %d\n", cont++, aux->pid);
-    printf("\n\n");
-}
-
 void liberaLista(Lista * lis){
     Cel* prox;
     Cel* aux = lis->prim;
