@@ -46,7 +46,7 @@ void armageddon(Lista* list, int pid){
             // Mata este processo.
             kill(aux->pid, SIGKILL);
         }
-        // Se o pid do processo é diferente do pid da main.
+        // Se o pid do processo é diferente do pid da VSH.
         else if(pid != aux->pid){
             // Se isso for verdade, mata o processo.
             killpg(aux->pid, SIGKILL);
