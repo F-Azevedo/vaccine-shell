@@ -101,7 +101,7 @@ void foreground(tCommand cmd[5], Lista* list, struct sigaction* act){
         // atenção
         // do
         // grupo
-        // aqui.
+        // aqui. Deixa de putaria fernando desembucha logo mlk
 
         // Seta o tratador de sinais do filho foregorund para BLOQUEAR SIGUSR 1 e 2.
         sigset_t sigset;
