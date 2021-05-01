@@ -28,10 +28,6 @@ void passaProFilho(int sig){
 
 // Handler que vai imprimir o Zeca.
 void zeca(int sig){
-    //Teste para ver se o signal fica pendente.
-    // Funcionou
-    sleep(10);
-
     printZeca();
 
     // Printa a linha de comando duas vezes se o sinal for mandado por kill pela própria VSH.
