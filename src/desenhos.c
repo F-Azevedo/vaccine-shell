@@ -4,9 +4,7 @@
 #include "desenhos.h"
 #include "Corzinha.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-
 
 // Constantes definidas com o propósito de
 // facilitar a impressão colorida do zé jacaré,
@@ -20,7 +18,7 @@
 #define T(c) SPOTLIGHT "7;" CIANO c RESET
 #define S(c) SPOTLIGHT VERMELHO c RESET
 
-// Limpa a saída padrão do terminal
+// Limpa a saída padrão do terminal.
 void clearScreen(void)
 {
     usleep(1 * 100000); // Tempo de espera
@@ -29,7 +27,7 @@ void clearScreen(void)
     write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
 }
 
-// Faz a impressão do zeca na saída padrão
+// Faz a impressão do Zeca na saída padrão.
 void printZeca(void){
     printf(
     "\n"
@@ -60,7 +58,7 @@ void printZeca(void){
     "   |->" BOLD VERDE " by zé jacaré\n" RESET RESET);
 }
 
-// Imprime a tela inicial
+// Imprime a tela inicial.
 void entryScreen(void){
     int c= 0;
     while(c++ < 2) {
@@ -358,12 +356,12 @@ void entryScreen(void){
                 "|   |                  S O                |   |\n"
                 "|   |                                     |   |\n"
                 "|   |   B Y:     "R("FERNANDO AZEVEDO")"         |   |\n"
-                                                        "| | |                                     | | |\n"
-                                                        "| V |            "A("IGOR VAREJÃO")"             | V |\n"
-                                                                                            "|   |                                     |   |\n"
-                                                                                            "|   |                                     |   |\n"
-                                                                                            "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
-                                                                                            "|   |                                     |   |\n");
+                "| | |                                     | | |\n"
+                "| V |            "A("IGOR VAREJÃO")"             | V |\n"
+                "|   |                                     |   |\n"
+                "|   |                                     |   |\n"
+                "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
+                "|   |                                     |   |\n");
         clearScreen();
         printf(
                 "|   |                                     |   |\n"
@@ -378,12 +376,12 @@ void entryScreen(void){
                 "|   |                  S O                |   |\n"
                 "|   |                                     |   |\n"
                 "|   |   B Y:     "R("FERNANDO AZEVEDO")"         |   |\n"
-                                                        "|   |                                     |   |\n"
-                                                        "| | |            "A("IGOR VAREJÃO")"             | | |\n"
-                                                                                            "| V |                                     | V |\n"
-                                                                                            "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
-                                                                                                                                       "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
-                                                                                                                                       "|   |                                     |   |\n");
+                "|   |                                     |   |\n"
+                "| | |            "A("IGOR VAREJÃO")"             | | |\n"
+                "| V |                                     | V |\n"
+                "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
+                "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
+                "|   |                                     |   |\n");
         clearScreen();
         printf(
                 "|   |                                     |   |\n"
@@ -398,12 +396,12 @@ void entryScreen(void){
                 "|   |                  S O                |   |\n"
                 "|   |                                     |   |\n"
                 "|   |   B Y:     "R("FERNANDO AZEVEDO")"         |   |\n"
-                                                        "|   |                                     |   |\n"
-                                                        "|   |            "A("IGOR VAREJÃO")"             |   |\n"
-                                                                                            "| | |                                     | | |\n"
-                                                                                            "| V |            "Y("LUÍS EDUARDO CÂMARA")"      | V |\n"
-                                                                                                                                       "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
-                                                                                                                                       "|   |                                     |   |\n");
+                "|   |                                     |   |\n"
+                "|   |            "A("IGOR VAREJÃO")"             |   |\n"
+                "| | |                                     | | |\n"
+                "| V |            "Y("LUÍS EDUARDO CÂMARA")"      | V |\n"
+                "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
+                "|   |                                     |   |\n");
         clearScreen();
         printf(
                 "|   |                                     |   |\n"
@@ -418,12 +416,12 @@ void entryScreen(void){
                 "|   |                  S O                |   |\n"
                 "|   |                                     |   |\n"
                 "|   |   B Y:     "R("FERNANDO AZEVEDO")"         |   |\n"
-                                                        "|   |                                     |   |\n"
-                                                        "|   |            "A("IGOR VAREJÃO")"             |   |\n"
-                                                                                            "|   |                                     |   |\n"
-                                                                                            "| | |            "Y("LUÍS EDUARDO CÂMARA")"      | | |\n"
-                                                                                                                                       "| V |- - - - - - - - - - - - - - - - - - -| V |\n"
-                                                                                                                                       "|   |                                     |   |\n");
+                "|   |                                     |   |\n"
+                "|   |            "A("IGOR VAREJÃO")"             |   |\n"
+                "|   |                                     |   |\n"
+                "| | |            "Y("LUÍS EDUARDO CÂMARA")"      | | |\n"
+                "| V |- - - - - - - - - - - - - - - - - - -| V |\n"
+                "|   |                                     |   |\n");
         clearScreen();
         printf(
                 "|   |                                     |   |\n"
@@ -438,12 +436,12 @@ void entryScreen(void){
                 "|   |                  S O                |   |\n"
                 "|   |                                     |   |\n"
                 "|   |   B Y:     "R("FERNANDO AZEVEDO")"         |   |\n"
-                                                        "|   |                                     |   |\n"
-                                                        "|   |            "A("IGOR VAREJÃO")"             |   |\n"
-                                                                                            "|   |                                     |   |\n"
-                                                                                            "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
-                                                                                                                                       "| | |- - - - - - - - - - - - - - - - - - -| | |\n"
-                                                                                                                                       "| V |                                     | V |\n");
+                "|   |                                     |   |\n"
+                "|   |            "A("IGOR VAREJÃO")"             |   |\n"
+                "|   |                                     |   |\n"
+                "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
+                "| | |- - - - - - - - - - - - - - - - - - -| | |\n"
+                "| V |                                     | V |\n");
         clearScreen();
         printf(
                 "|   |                                     |   |\n"
@@ -458,12 +456,12 @@ void entryScreen(void){
                 "|   |                  S O                |   |\n"
                 "|   |                                     |   |\n"
                 "|   |   B Y:     "R("FERNANDO AZEVEDO")"         |   |\n"
-                                                        "|   |                                     |   |\n"
-                                                        "|   |            "A("IGOR VAREJÃO")"             |   |\n"
-                                                                                            "|   |                                     |   |\n"
-                                                                                            "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
-                                                                                                                                       "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
-                                                                                                                                       "| | |                                     | | |\n");
+                "|   |                                     |   |\n"
+                "|   |            "A("IGOR VAREJÃO")"             |   |\n"
+                "|   |                                     |   |\n"
+                "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
+                "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
+                "| | |                                     | | |\n");
         clearScreen();
         printf(
                 "|   |                                     |   |\n"
@@ -478,14 +476,11 @@ void entryScreen(void){
                 "|   |                  S O                |   |\n"
                 "|   |                                     |   |\n"
                 "|   |   B Y:     "R("FERNANDO AZEVEDO")"         |   |\n"
-                                                        "|   |                                     |   |\n"
-                                                        "|   |            "A("IGOR VAREJÃO")"             |   |\n"
-                                                                                            "|   |                                     |   |\n"
-                                                                                            "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
-                                                                                                                                       "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
-                                                                                                                                       "|   |                                     |   |\n");
-
-
-
+                "|   |                                     |   |\n"
+                "|   |            "A("IGOR VAREJÃO")"             |   |\n"
+                "|   |                                     |   |\n"
+                "|   |            "Y("LUÍS EDUARDO CÂMARA")"      |   |\n"
+                "|   |- - - - - - - - - - - - - - - - - - -|   |\n"
+                "|   |                                     |   |\n");
     }
 }
