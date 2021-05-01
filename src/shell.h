@@ -9,6 +9,6 @@
 
 void printLineCommand();
 void run_shell(Lista *, struct sigaction*);
-void setSigactionMain(struct sigaction* act);
+void setSigactionPadraoVSH(struct sigaction* act);
 
 #endif //T1_SO_SHELL_H

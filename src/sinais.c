@@ -40,7 +40,7 @@ void zeca(int sig){
 }
 
 //Função para modificar o Sigaction da VSH enquanto ela espera o processo de foreground terminar.
-void setSigactionForeground(struct sigaction* act, int pid){
+void setSigactionVSH(struct sigaction* act, int pid){
     // Seta a variável global para o pid do filho.
     SON_PID = pid;
 
@@ -61,7 +61,7 @@ void resetSigaction(struct sigaction* act){
 }
 
 // Função para atribuir o Sigaction padrão da VSH.
-void setSigactionMain(struct sigaction* act){
+void setSigactionPadraoVSH(struct sigaction* act){
     act->sa_handler = zeca;
 
     sigset_t sigset;
@@ -84,6 +84,13 @@ void setSigactionMain(struct sigaction* act){
 void setSigactionSIGUSR(struct sigaction* act){
     act->sa_handler = signalHandler;
     act->sa_flags = SA_RESTART;
+    sigaction(SIGUSR1, act, NULL);
+    sigaction(SIGUSR2, act, NULL);
+}
+
+void setSigactionForeground(struct sigaction* act){
+    act->sa_handler = SIG_IGN;
+    sigemptyset(&act->sa_mask);
     sigaction(SIGUSR1, act, NULL);
     sigaction(SIGUSR2, act, NULL);
 }

@@ -97,31 +97,18 @@ void foreground(tCommand cmd[5], Lista* list, struct sigaction* act){
     if(pid == 0){
         // Filho da VSH que vai executar o comando.
 
-        // Chamar
-        // atenção
-        // do
-        // grupo
-        // aqui. Deixa de putaria fernando desembucha logo mlk
-
-        // Seta o tratador de sinais do filho foregorund para BLOQUEAR SIGUSR 1 e 2.
-        sigset_t sigset;
-        sigemptyset(&sigset);
-        sigaddset(&sigset, SIGUSR1);
-        sigaddset(&sigset, SIGUSR2);
-        if(sigprocmask(SIG_BLOCK, &sigset, NULL))
-            perror("Erro na criação da sigprocmask\n");
+        // Seta o tratador de sinais do filho foregorund para ingnorar SIGUSR 1 e 2.
+        setSigactionForeground(act);
 
         // Filho executa o comando.
         if(execvp(cmd[0].command, cmd[0].args) == -1){
-            printf("Da um comando válido filhx da pute\n");
+            printf("Da um comando válido robertinha\n");
             exit(0);
         }
-        sigprocmask(SIG_UNBLOCK, &sigset, NULL);
-
     }
     else{
         // VSH muda seu tratador de sinais para passar os sinais recebidos por teclado para o filho.
-        setSigactionForeground(act, pid);
+        setSigactionVSH(act, pid);
 
         int status;
         // VSH espera o filho terminar ou ser suspenso.
@@ -136,7 +123,7 @@ void foreground(tCommand cmd[5], Lista* list, struct sigaction* act){
         // Reseta o Sigaction da VSH.
         resetSigaction(act);
         // Seta o Sigaction da VSH para o padrão.
-        setSigactionMain(act);
+        setSigactionPadraoVSH(act);
     }
 }
 
@@ -195,7 +182,7 @@ void background(tCommand cmd[5], int qtdCmds, Lista* list){
 
                 // Executa o comando.
                 if(execvp(cmd[j].command, cmd[j].args) == -1) {
-                    printf("Da um comando válido filhx del pute\n");
+                    printf("Da um comando válido robertinha\n");
                     exit(0);
                 }
             } else {

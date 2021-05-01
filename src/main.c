@@ -8,7 +8,7 @@ int main() {
     struct sigaction act;
 
     // Inicia nosso controle de sinais, capturando os SIGUSR 1 e 2.
-    setSigactionMain(&act);
+    setSigactionPadraoVSH(&act);
 
     // Imprime tela de entrada.
     entryScreen();
